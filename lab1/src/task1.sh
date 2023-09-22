@@ -1,0 +1,3 @@
+pwd
+printenv PATH
+date
