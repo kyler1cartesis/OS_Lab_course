@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 i=0
 sum=0
 for an_arg in "$@" ; do

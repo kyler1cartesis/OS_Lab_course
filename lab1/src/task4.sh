@@ -2,7 +2,7 @@
 i=0
 sum=0
 IFS=" "
-while read number in $@; do
+for number in $@ ; do
   # echo $number
   # break;
   ((sum+=number))
