@@ -1,0 +1,130 @@
+gcc main.c revert_string.c -o revert_string -Wall -O3
+chmod +rwx revert_string
+
+gcc -c revert_string.c -o static/revert_string.o
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ gcc -c main.c -o main.o
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ gcc -c -fPIC revert_string.c -o shared/revert_string.o
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ cd static
+@kyler1cartesis ➜ .../lab2/src/revert_string/static (master) $ ar rcs lib_revert_string.a revert_string.o
+gcc main.o -Lstatic -l_revert_string -o static/revert_string
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ ./static/revert_string 12314
+Reverted: 41321
+
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ cd shared
+@kyler1cartesis ➜ .../lab2/src/revert_string/shared (master) $ gcc -shared *.o -o lib_revert_string.so
+@kyler1cartesis ➜ .../lab2/src/revert_string/shared (master) $ cd..
+bash: cd..: command not found
+@kyler1cartesis ➜ .../lab2/src/revert_string/shared (master) $ cd ..
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ gcc main.o -Lshared -l_revert_string -o shared/revert_string
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/revert_string (master) $ ./shared/revert_string
+./shared/revert_string: error while loading shared libraries: lib_revert_string.so: cannot open shared object file: No such file or directory
+@kyler1cartesis ➜ .../lab2/src/revert_string/shared (master) $ export LD_LIBRARY_PATH=$(pwd)
+@kyler1cartesis ➜ .../lab2/src/revert_string/shared (master) $ echo  $LD_LIBRARY_PATH
+/workspaces/OS_Lab_course/lab2/src/revert_string/shared
+@kyler1cartesis ➜ .../lab2/src/revert_string/shared (master) $ ./revert_string 1234
+Reverted: 4321
+
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ gcc -c tests.c -o tests.o -O3
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ cd ..
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab2/src (master) $ gcc tests/tests.o -Lrevert_string/shared -l_revert_string -o tests/tests_shared -O3 -lcunit
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab2/src (master) $ cd tests
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ chmod +x tests_shared
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/../revert_string/shared
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ echo  $LD_LIBRARY_PATH
+:../revert_string/shared:/workspaces/OS_Lab_course/lab2/src/tests/../revert_string/shared
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ ./tests_shared
+
+
+     CUnit - A unit testing framework for C - Version 2.1-3
+     http://cunit.sourceforge.net/
+
+
+Suite: Suite
+  Test: test of RevertString function ...passed
+
+Run Summary:    Type  Total    Ran Passed Failed Inactive
+              suites      1      1    n/a      0        0
+               tests      1      1      1      0        0
+             asserts      4      4      4      0      n/a
+
+Elapsed time =    0.000 seconds
+
+@kyler1cartesis ➜ .../OS_Lab_course/lab2/src/tests (master) $ objdump tests_shared -t
+
+tests_shared:     file format elf64-x86-64
+
+SYMBOL TABLE:
+0000000000000318 l    d  .interp        0000000000000000              .interp
+0000000000000338 l    d  .note.gnu.property     0000000000000000              .note.gnu.property
+0000000000000358 l    d  .note.gnu.build-id     0000000000000000              .note.gnu.build-id
+000000000000037c l    d  .note.ABI-tag  0000000000000000              .note.ABI-tag
+00000000000003a0 l    d  .gnu.hash      0000000000000000              .gnu.hash
+00000000000003d8 l    d  .dynsym        0000000000000000              .dynsym
+00000000000005a0 l    d  .dynstr        0000000000000000              .dynstr
+000000000000070e l    d  .gnu.version   0000000000000000              .gnu.version
+0000000000000738 l    d  .gnu.version_r 0000000000000000              .gnu.version_r
+0000000000000768 l    d  .rela.dyn      0000000000000000              .rela.dyn
+0000000000000828 l    d  .rela.plt      0000000000000000              .rela.plt
+0000000000001000 l    d  .init  0000000000000000              .init
+0000000000001020 l    d  .plt   0000000000000000              .plt
+00000000000010d0 l    d  .plt.got       0000000000000000              .plt.got
+00000000000010e0 l    d  .plt.sec       0000000000000000              .plt.sec
+0000000000001180 l    d  .text  0000000000000000              .text
+0000000000001508 l    d  .fini  0000000000000000              .fini
+0000000000002000 l    d  .rodata        0000000000000000              .rodata
+0000000000002160 l    d  .eh_frame_hdr  0000000000000000              .eh_frame_hdr
+00000000000021b0 l    d  .eh_frame      0000000000000000              .eh_frame
+0000000000003d50 l    d  .init_array    0000000000000000              .init_array
+0000000000003d58 l    d  .fini_array    0000000000000000              .fini_array
+0000000000003d60 l    d  .dynamic       0000000000000000              .dynamic
+0000000000003f70 l    d  .got   0000000000000000              .got
+0000000000004000 l    d  .data  0000000000000000              .data
+0000000000004010 l    d  .bss   0000000000000000              .bss
+0000000000000000 l    d  .comment       0000000000000000              .comment
+0000000000000000 l    df *ABS*  0000000000000000              tests.c
+0000000000000000 l    df *ABS*  0000000000000000              crtstuff.c
+0000000000001210 l     F .text  0000000000000000              deregister_tm_clones
+0000000000001240 l     F .text  0000000000000000              register_tm_clones
+0000000000001280 l     F .text  0000000000000000              __do_global_dtors_aux
+0000000000004010 l     O .bss   0000000000000001              completed.8061
+0000000000003d58 l     O .fini_array    0000000000000000              __do_global_dtors_aux_fini_array_entry
+00000000000012c0 l     F .text  0000000000000000              frame_dummy
+0000000000003d50 l     O .init_array    0000000000000000              __frame_dummy_init_array_entry
+0000000000000000 l    df *ABS*  0000000000000000              crtstuff.c
+00000000000022d4 l     O .eh_frame      0000000000000000              __FRAME_END__
+0000000000000000 l    df *ABS*  0000000000000000              
+0000000000003d58 l       .init_array    0000000000000000              __init_array_end
+0000000000003d60 l     O .dynamic       0000000000000000              _DYNAMIC
+0000000000003d50 l       .init_array    0000000000000000              __init_array_start
+0000000000002160 l       .eh_frame_hdr  0000000000000000              __GNU_EH_FRAME_HDR
+0000000000003f70 l     O .got   0000000000000000              _GLOBAL_OFFSET_TABLE_
+0000000000001000 l     F .init  0000000000000000              _init
+0000000000001500 g     F .text  0000000000000005              __libc_csu_fini
+0000000000000000       F *UND*  0000000000000000              CU_basic_set_mode
+0000000000000000       F *UND*  0000000000000000              CU_initialize_registry
+0000000000000000  w      *UND*  0000000000000000              _ITM_deregisterTMCloneTable
+0000000000004000  w      .data  0000000000000000              data_start
+0000000000000000       F *UND*  0000000000000000              CU_cleanup_registry
+0000000000000000       F *UND*  0000000000000000              CU_add_suite
+0000000000000000       F *UND*  0000000000000000              CU_basic_run_tests
+0000000000004010 g       .data  0000000000000000              _edata
+0000000000001508 g     F .fini  0000000000000000              .hidden _fini
+0000000000000000       F *UND*  0000000000000000              __stack_chk_fail@@GLIBC_2.4
+0000000000000000       F *UND*  0000000000000000              CU_get_error
+0000000000000000       F *UND*  0000000000000000              RevertString
+0000000000000000       F *UND*  0000000000000000              __libc_start_main@@GLIBC_2.2.5
+0000000000004000 g       .data  0000000000000000              __data_start
+0000000000000000  w      *UND*  0000000000000000              __gmon_start__
+0000000000000000       F *UND*  0000000000000000              CU_assertImplementation
+0000000000004008 g     O .data  0000000000000000              .hidden __dso_handle
+0000000000002000 g     O .rodata        0000000000000004              _IO_stdin_used
+0000000000001490 g     F .text  0000000000000065              __libc_csu_init
+00000000000012d0 g     F .text  00000000000001b7              testRevertString
+0000000000004018 g       .bss   0000000000000000              _end
+00000000000011e0 g     F .text  000000000000002f              _start
+0000000000000000       F *UND*  0000000000000000              CU_add_test
+0000000000004010 g       .bss   0000000000000000              __bss_start
+0000000000001180 g     F .text  000000000000005e              main
+0000000000004010 g     O .data  0000000000000000              .hidden __TMC_END__
+0000000000000000  w      *UND*  0000000000000000              _ITM_registerTMCloneTable
+0000000000000000  w    F *UND*  0000000000000000              __cxa_finalize@@GLIBC_2.2.5
