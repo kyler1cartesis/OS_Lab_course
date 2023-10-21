@@ -1,0 +1,17 @@
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab3/src (master) $ gcc *.c -std=c17 -Wall -O2 -o min_max
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab3/src (master) $ chmod +x min_max
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab3/src (master) $ ./min_max_seq 1 100
+min: 0
+max: 2145174067
+
+make all
+
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab3/src (master) $ ./min_max_par --seed 100 --array_size 1000 --pnum 4
+Got: 2131132462 2080951
+Got: 2141111200 2488210
+Got: 2139865461 11268765
+Got: 2145432356 0
+Min: 0
+Max: 2145432356
+Elapsed time: 0.586000 ms
+

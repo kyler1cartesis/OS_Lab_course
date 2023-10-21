@@ -1,9 +1,11 @@
+#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
 
 #include <sys/time.h>
@@ -15,6 +17,7 @@
 #include "find_min_max.h"
 #include "utils.h"
 
+void kill_process (pid_t id);
 int main(int argc, char **argv) {
   int seed = -1;
   int array_size = -1;
@@ -40,24 +43,20 @@ int main(int argc, char **argv) {
         switch (option_index) {
           case 0:
             seed = atoi(optarg);
-            // your code here
-            // error handling
+            assert(("Seed не должен быть равен -1!", seed != -1));
             break;
           case 1:
             array_size = atoi(optarg);
-            // your code here
-            // error handling
+            assert(("Размер массива должен быть больше нуля!", array_size > 0));
             break;
           case 2:
             pnum = atoi(optarg);
-            // your code here
-            // error handling
+            assert(("Количество потоков должно быть больше нуля!", pnum > 0));
             break;
           case 3:
             with_files = true;
             break;
-
-          defalut:
+          default:
             printf("Index %d is out of options\n", option_index);
         }
         break;
@@ -74,19 +73,23 @@ int main(int argc, char **argv) {
   }
 
   if (optind < argc) {
-    printf("Has at least one no option argument\n");
-    return 1;
+    return (printf("Has at least one no option argument\n"), 1);
   }
 
   if (seed == -1 || array_size == -1 || pnum == -1) {
-    printf("Usage: %s --seed \"num\" --array_size \"num\" --pnum \"num\" \n",
-           argv[0]);
-    return 1;
+    return (printf("Usage: %s --seed \"num\" --array_size \"num\" --pnum \"num\" \n", argv[0]), 1);
   }
 
   int *array = malloc(sizeof(int) * array_size);
   GenerateArray(array, array_size, seed);
   int active_child_processes = 0;
+
+  FILE *fp;
+  if (with_files) 
+    fp = fopen("tmp.txt", "w");
+
+  int pipefd[2];
+  pipe(pipefd);
 
   struct timeval start_time;
   gettimeofday(&start_time, NULL);
@@ -95,49 +98,61 @@ int main(int argc, char **argv) {
     pid_t child_pid = fork();
     if (child_pid >= 0) {
       // successful fork
-      active_child_processes += 1;
+      ++active_child_processes;
       if (child_pid == 0) {
         // child process
-
         // parallel somehow
-
+        struct MinMax min_max = GetMinMax(array, (array_size*i)/pnum, (array_size*(i+1))/pnum);
         if (with_files) {
           // use files here
+          fprintf(fp, "%d %d\n", min_max.max,min_max.min);
         } else {
-          // use pipe here
+          close(pipefd[0]);
+          write(pipefd[1], &min_max.max, sizeof(min_max.max));
+          write(pipefd[1], &min_max.min, sizeof(min_max.min));
+          close(pipefd[1]);
         }
         return 0;
       }
-
-    } else {
+    }
+    else {
       printf("Fork failed!\n");
       return 1;
     }
   }
-
+  if (with_files)
+    fclose(fp);
   while (active_child_processes > 0) {
-    // your code here
-
+    wait(NULL);
     active_child_processes -= 1;
   }
 
   struct MinMax min_max;
   min_max.min = INT_MAX;
   min_max.max = INT_MIN;
-
+  if (with_files)
+    fp = fopen("tmp.txt", "r");
   for (int i = 0; i < pnum; i++) {
     int min = INT_MAX;
     int max = INT_MIN;
 
     if (with_files) {
-      // read from files
+      fscanf(fp,"%d %d",&max,&min);
+      printf("Got: %d %d\n", max, min);
     } else {
       // read from pipes
+      read(pipefd[0], &max, 4);
+      read(pipefd[0], &min, 4);
+      printf("Got: %d %d\n", max, min);
+      //close(pipefd[0]);
     }
 
     if (min < min_max.min) min_max.min = min;
     if (max > min_max.max) min_max.max = max;
   }
+  close(pipefd[0]);
+  if (with_files)
+    fclose(fp);
 
   struct timeval finish_time;
   gettimeofday(&finish_time, NULL);
@@ -149,7 +164,13 @@ int main(int argc, char **argv) {
 
   printf("Min: %d\n", min_max.min);
   printf("Max: %d\n", min_max.max);
-  printf("Elapsed time: %fms\n", elapsed_time);
+  printf("Elapsed time: %f ms\n", elapsed_time);
   fflush(NULL);
   return 0;
+}
+
+void kill_process (pid_t id) {
+  kill(id, SIGKILL);
+  int status;
+  wait(&status);
 }
