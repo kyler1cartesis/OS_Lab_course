@@ -1,0 +1,25 @@
+make parallel
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab4/src (master) $ ./parallel --seed 1 --array_size 100 --pnum 4 --timeout 2
+Got: 2044897763 35005211
+Got: 2145174067 149798315
+Got: 2053999932 356426808
+Got: 2084420925 42999170
+Min: 35005211
+Max: 2145174067
+Elapsed sleep_time: 1.185000ms
+
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab4/src (master) $ ./process
+
+Address etext: 0x558a69a32515 
+Address edata: 0x558a69a35018 
+Address end  : 0x558a69a35050 
+ID main          is at virtual address: 0x558a69a32160
+ID showit        is at virtual address: 0x558a69a323c0
+ID cptr          is at virtual address: 0x558a69a35010
+ID buffer1       is at virtual address: 0x558a69a35030
+ID i     is at virtual address: 0x7ffed133d124
+A demonstration
+ID buffer2       is at virtual address: 0x7ffed133d100
+Alocated memory at 0x558a69b196b0
+This message is output by the function showit()
+
