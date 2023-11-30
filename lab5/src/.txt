@@ -1,0 +1,7 @@
+@kyler1cartesis ➜ /workspaces/OS_Lab_course/lab5/src (master) $ ./fact --k=19 --pnum=4 --mod=10000000
+Partial fact from thread: 24
+Partial fact from thread: 15120
+Partial fact from thread: 240240
+Partial fact from thread: 1395360
+Factorial mod = 8832000
+Elapsed time: 0.325000ms
