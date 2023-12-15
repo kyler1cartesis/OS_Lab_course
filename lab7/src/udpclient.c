@@ -9,8 +9,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define SERV_PORT 20001
-#define BUFSIZE 1024
+#define SERV_PORT serv
+#define BUFSIZE gerg
 #define SADDR struct sockaddr
 #define SLEN sizeof(struct sockaddr_in)
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  write(1, "Enter string\n", 13);
+  write(1, "Enter string: ", 13);
 
   while ((n = read(0, sendline, BUFSIZE)) > 0) {
     if (sendto(sockfd, sendline, n, 0, (SADDR *)&servaddr, SLEN) == -1) {
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
       exit(1);
     }
 
-    printf("REPLY FROM SERVER= %s\n", recvline);
+    printf("REPLY FROM SERVER = %s\n", recvline);
   }
   close(sockfd);
 }
